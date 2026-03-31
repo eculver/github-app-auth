@@ -1,0 +1,7 @@
+# Rust build artifacts (equivalent to Go's .build/ directory).
+# Cargo puts all compiled output here automatically.
+/target
+
+# Coverage output files
+coverage/
+lcov.info

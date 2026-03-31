@@ -1,0 +1,59 @@
+[package]
+name = "github-app-auth"
+version = "0.1.0"
+edition = "2021"
+description = "Authentication utilities for GitHub Apps"
+license = "MIT"
+
+# This makes the crate importable as `github_app_auth` in other projects,
+# while the binary is named `github-app`. Cargo automatically converts
+# hyphens to underscores for the library name.
+#
+# Other projects can depend on this crate:
+#
+#   [dependencies]
+#   github-app-auth = { git = "..." }
+#
+# And import it:
+#
+#   use github_app_auth::App;
+
+[[bin]]
+name = "github-app"
+path = "src/main.rs"
+
+[dependencies]
+# CLI argument parsing. The "derive" feature lets us define args as structs
+# with #[derive(Parser)] — the most ergonomic and conventional approach.
+clap = { version = "4", features = ["derive", "env"] }
+
+# JWT creation and signing (RS256). This crate handles PEM parsing internally
+# so we don't need a separate RSA crate.
+jsonwebtoken = "9"
+
+# The standard HTTP client for Rust. We use the blocking (synchronous) variant
+# since this is a simple request/response CLI tool — no need for async.
+reqwest = { version = "0.12", features = ["blocking", "json"] }
+
+# Serde is Rust's universal serialization framework. Almost every Rust project
+# uses it. The "derive" feature gives us #[derive(Serialize, Deserialize)].
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# Date/time handling for JWT expiry timestamps.
+chrono = { version = "0.4", features = ["serde"] }
+
+# Derive macro for creating error types. This is the standard way to define
+# error enums in Rust libraries — it auto-generates Display and Error impls.
+thiserror = "2"
+
+# Logging facade + backend. The `log` crate provides macros (debug!, info!,
+# etc.) that the library uses. `env_logger` is the backend that the binary
+# configures to actually print the log messages.
+log = "0.4"
+env_logger = "0.11"
+
+[dev-dependencies]
+# HTTP mocking for tests. Creates a local HTTP server that returns canned
+# responses — similar to Go's httptest.NewServer.
+mockito = "1"
