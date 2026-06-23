@@ -35,6 +35,13 @@ const DEFAULT_BASE_URL: &str = "https://api.github.com";
 /// The Accept header value for GitHub App API endpoints.
 const GITHUB_ACCEPT_HEADER: &str = "application/vnd.github+json";
 
+/// The `User-Agent` header value sent with every GitHub API request.
+///
+/// GitHub requires a `User-Agent` header on all API requests and rejects
+/// requests without one. See:
+/// <https://docs.github.com/en/rest/using-the-rest-api/getting-started-with-the-rest-api#user-agent>
+const USER_AGENT: &str = concat!(env!("CARGO_PKG_NAME"), "/", env!("CARGO_PKG_VERSION"));
+
 /// JWT claims for GitHub App authentication.
 ///
 /// These are the standard claims required by GitHub when authenticating as a
@@ -109,7 +116,9 @@ impl App {
             id: id.into(),
             encoding_key,
             base_url: DEFAULT_BASE_URL.to_string(),
-            client: reqwest::blocking::Client::new(),
+            client: reqwest::blocking::Client::builder()
+                .user_agent(USER_AGENT)
+                .build()?,
             jwt: None,
             jwt_exp: None,
         })
@@ -426,6 +435,7 @@ mod tests {
             .mock("POST", "/app/installations/5678/access_tokens")
             .match_header("Authorization", "Bearer test-jwt")
             .match_header("Accept", GITHUB_ACCEPT_HEADER)
+            .match_header("User-Agent", USER_AGENT)
             .with_status(201)
             .with_header("Content-Type", "application/json")
             .with_body(
@@ -510,6 +520,7 @@ mod tests {
             .mock("GET", "/app/installations")
             .match_header("Authorization", "Bearer test-jwt")
             .match_header("Accept", GITHUB_ACCEPT_HEADER)
+            .match_header("User-Agent", USER_AGENT)
             .with_status(200)
             .with_header("Content-Type", "application/json")
             .with_body(
@@ -591,6 +602,7 @@ mod tests {
             .mock("GET", "/repos/octocat/hello-world/installation")
             .match_header("Authorization", "Bearer test-jwt")
             .match_header("Accept", GITHUB_ACCEPT_HEADER)
+            .match_header("User-Agent", USER_AGENT)
             .with_status(200)
             .with_header("Content-Type", "application/json")
             .with_body(
