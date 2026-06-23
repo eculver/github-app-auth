@@ -1,0 +1,22 @@
+# Build artifacts — rebuilt inside the image.
+/target
+debug
+coverage/
+lcov.info
+
+# Note: .git is intentionally NOT ignored — build.rs runs `git describe` during
+# the build to bake the version into the binary.
+.gitignore
+
+# Docs and tooling not needed for the build.
+README.md
+LICENSE
+Makefile
+tests/
+
+# Editor/OS cruft.
+**/*.rs.bk
+*.pdb
+.idea/
+.vscode/
+.DS_Store

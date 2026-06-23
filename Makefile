@@ -6,6 +6,7 @@
 #   make           - Build the binary (default)
 #   make test      - Run tests with linting
 #   make cover     - Run tests and open HTML coverage report in browser
+#   make docker    - Build the container image
 #   make install   - Install the binary to ~/.cargo/bin/
 #   make clean     - Remove build artifacts
 
@@ -54,6 +55,22 @@ cover-lcov:
 .PHONY: build
 build:
 	@cargo build --release
+
+# ---------------------------------------------------------------------------
+# Container image
+# ---------------------------------------------------------------------------
+
+# Image name/tag — override on the command line, e.g.:
+#   make docker IMAGE=ghcr.io/me/github-app-auth TAG=v1.2.3
+IMAGE ?= github-app-auth
+TAG ?= latest
+
+# Build the container image. build.rs runs `git describe` inside the build (the
+# .git directory is shipped in the build context) so the image's `--version`
+# matches a host build — no build arg needed.
+.PHONY: docker
+docker:
+	@docker build -t $(IMAGE):$(TAG) .
 
 # ---------------------------------------------------------------------------
 # Install / Uninstall
